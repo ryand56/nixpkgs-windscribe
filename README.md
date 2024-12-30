@@ -7,7 +7,7 @@
 </h1>
 
 <div align="center"> Unofficial Windscribe GUI & CLI for NixOS </div>
-<div align="center"> (working) </div>
+<div align="center">(working)</div>
 
 > [!NOTE]
 > Currently only WireGaurd protocol works.
