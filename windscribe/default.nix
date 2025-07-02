@@ -63,7 +63,6 @@ in
       wantedBy = [ "default.target" ];
       serviceConfig = {
         ExecStart = "${cfg.package}/opt/windscribe/Windscribe";
-        Group = "windscribe";
         Restart = "on-failure";
       };
     };
