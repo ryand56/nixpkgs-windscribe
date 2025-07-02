@@ -23,13 +23,10 @@ in
   };
 
   config = mkIf cfg.enable {
-    nixpkgs.config.allowUnfree = true;
+    users.groups.windscribe = { };
 
     environment.systemPackages = [ cfg.package ];
-
     systemd.packages = [ cfg.package ];
-
-    networking.networkmanager.enable = true;
 
     security.polkit.enable = true;
 
@@ -49,12 +46,30 @@ in
       "windscribe/update-systemd-resolved".source = "${cfg.package}/etc/windscribe/update-systemd-resolved";
     };
 
-    systemd.services.windscribe-helper = mkIf cfg.autoStart {
+    systemd.services.windscribe-helper = {
+      description = "Windscribe Helper Service";
+      after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        ExecStart = "${cfg.package}/opt/windscribe/helper";
+        Group = "windscribe";
+        Restart = "on-failure";
+      };
     };
 
-    systemd.user.services.windscribe = mkIf cfg.autoStart {
-      wantedBy = [ "default.target" ];
+    security.wrappers.windscribe-gui = {
+      owner = "root";
+      group = "windscribe"; 
+      permissions = "u=rx,g=rxs,o="; 
+      setgid = true;
+      source = "${cfg.package}/bin/windscribe";
+    };
+
+    environment.sessionVariables = {
+      QT_PLUGIN_PATH = makeSearchPathOutput "lib" "qt-6/plugins" [
+        pkgs.qt6.qtbase
+        pkgs.qt6.qtwayland
+      ];
     };
   };
 }
