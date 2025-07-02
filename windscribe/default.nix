@@ -56,6 +56,17 @@ in
         Restart = "on-failure";
       };
     };
+    
+    systemd.user.services.windscribe = {
+      description = "Windscribe Service";
+      after = [ "network.target" ];
+      wantedBy = [ "default.target" ];
+      serviceConfig = {
+        ExecStart = "${cfg.package}/opt/windscribe/Windscribe";
+        Group = "windscribe";
+        Restart = "on-failure";
+      };
+    };
 
     security.wrappers.windscribe-gui = {
       owner = "root";
