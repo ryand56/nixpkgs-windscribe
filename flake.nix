@@ -9,7 +9,7 @@
     in
     rec {
       packages.default = packages.windscribe;
-      packages.windscribe = pkgs.callPackage ./windscribe.nix {};
+      packages.windscribe = pkgs.callPackage ./windscribe/package.nix { };
       apps.windscribe_helper = {
         type = "app";
         program = "${packages.windscribe}/opt/windscribe/helper";
@@ -23,5 +23,7 @@
         program = "${packages.windscribe}/opt/windscribe/windscribeopenvpn";
       };
     }
-  );
+  ) // {
+    nixosModules.default = import ./windscribe;
+  };
 }

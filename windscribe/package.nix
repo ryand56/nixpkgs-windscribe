@@ -1,37 +1,52 @@
-{ lib
-, stdenv
-, fetchurl
-, dpkg
-, autoPatchelfHook
-, makeWrapper
-, wrapGAppsHook
-, qt6Packages
-, glib
-, gtk3
-, mesa
-, nspr
-, nss
-, systemd
-, xorg
-, libudev0-shim
-, curl
-, openssl
-, qt6
-, libnl
-, libcap_ng
+{
+  lib,
+  stdenv,
+  fetchurl,
+  dpkg,
+  autoPatchelfHook,
+  makeWrapper,
+  wrapGAppsHook,
+  qt6Packages,
+  glib,
+  gtk3,
+  mesa,
+  nspr,
+  nss,
+  systemd,
+  xorg,
+  libudev0-shim,
+  curl,
+  openssl,
+  qt6,
+  libnl,
+  libcap_ng,
 }:
-
+let
+  suffix =
+    {
+      aarch64-linux = "arm64";
+      x86_64-linux = "amd64";
+    }
+    .${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+in
 stdenv.mkDerivation rec {
   pname = "windscribe";
-  version = "2.11.11";
+  version = "2.15.8";
 
   src = fetchurl {
-    url = "https://github.com/Windscribe/Desktop-App/releases/download/v${version}/windscribe-cli_${version}_amd64.deb";
-    sha256 = "05bdmlrnfc47z1fvphjfqdbsy8215246g6m7fdadbv2pj69krxyd";
+    url = "https://github.com/Windscribe/Desktop-App/releases/download/v${version}/windscribe-cli_${version}_${suffix}.deb";
+    hash =
+      {
+        aarch64-linux = "sha256-17Nz3rjv1zXUET+D4YojNJodBYWRMWMkauFQCPFCkuI=";
+        x86_64-linux = "sha256-MPuKoMslMwcd6iQtslZSTBagIXUxpf6Slx+0v4TcQhY=";
+      }
+      .${stdenv.hostPlatform.system}
+        or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
   };
 
   nativeBuildInputs = [
-    dpkg 
+    dpkg
     autoPatchelfHook
     makeWrapper
     wrapGAppsHook
@@ -111,12 +126,12 @@ stdenv.mkDerivation rec {
     done
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Windscribe VPN Client";
     homepage = "https://windscribe.com";
-    license = licenses.unfree;
-    maintainers = with maintainers; [ ParkerrDev ];
-    platforms = [ "x86_64-linux" ];
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+    license = lib.licenses.gpl2Plus;
+    maintainers = with lib.maintainers; [ ryand56 ];
+    platforms = lib.platforms.linux;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
 }
